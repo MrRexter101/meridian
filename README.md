@@ -128,6 +128,34 @@ Then copy the output into `assets/video/`. `studio/node_modules`, `out/` and
 
 ---
 
+## Connecting the sheet
+
+Two Google artefacts, and they do different jobs.
+
+**The access-codes sheet** is *published to the web* as CSV and read by the
+browser. It answers one question: who may sign in. It is public by
+definition — put nothing in it but codes, roles and seats.
+
+**The cohort sheet** is *private* and never published. An Apps Script bound
+to it receives check-ins and feature requests. Paste `server/Code.gs` into
+Extensions → Apps Script, set `POST_TOKEN` to match `M.POST_TOKEN`, deploy as
+a Web app (execute as **Me**, access **Anyone**), and put the URL into
+`M.CHECKIN_ENDPOINT`.
+
+There is nothing else to fill in. Mail goes to the account the script runs
+as, and the code list is read from the published sheet.
+
+**Editing the script does not update the live endpoint.** Deploy → Manage
+deployments → pencil → Version: **New version**. Skipping that is why a fix
+appears to change nothing.
+
+To check it: open the deployment URL in a browser. It reports whether it is
+alive, whether a recipient resolves, and which tabs it can see. The Setup
+screen inside the app reports the other half — how many items are queued on
+that device and when it last tried.
+
+---
+
 ## Publishing to GitHub Pages
 
 The site is the repository. There is no build step.

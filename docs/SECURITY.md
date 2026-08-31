@@ -103,6 +103,60 @@ each one carries so the next edit does not drop one.
 
 ---
 
+## Fixed after going live
+
+### 4. The endpoint locked everyone out but the first person — *critical*
+
+`knownCode_()` validated writes against the **Roster** tab — a tab this same
+script populates, via `upsertRoster_`, which runs *after* the check. So the
+first ever write found the tab empty, was allowed through, and created a row.
+From that moment every *other* code was "not on the roster" and was dropped.
+
+Exactly one participant ever reached the sheet. There was no error: the
+handler returns `ok()` on rejection, so the client saw success.
+
+**Fixed.** It now validates against the published access-codes CSV — the same
+list the site itself reads, and the actual answer to "who is allowed". Adding
+a row there grants access to the site and the endpoint at once. If the sheet
+is unreachable the write is *accepted*: a blip on Google's side must not throw
+away somebody's streak, and the token and rate limit are still in front of it.
+
+### 5. Mail had nowhere to go — *high*
+
+`REQUESTS_TO` was an empty string in the committed template, because an
+address in a public repo is scrapeable. Empty is worse: `MailApp.sendEmail`
+throws on an empty recipient, the throw is caught, and the result is silence.
+
+**Fixed.** The recipient now resolves to the account the script runs as
+(`Session.getEffectiveUser()`), so there is no field to leave blank and
+nothing sensitive committed. A `REQUESTS_TO` script property overrides it.
+
+### 6. Formula injection into your spreadsheet — *high*
+
+`clean_()` was applied to note text and request bodies, but **name, seat,
+role and day went into cells raw**. The name is typed by the participant at
+sign-in and nothing validates it, so a name of
+`=HYPERLINK("http://evil","Payroll")` became a live formula in the Roster,
+Check-ins, Field notes and Requests tabs.
+
+**Fixed.** Every string reaching a cell goes through `clean_()`. The mail
+subject also strips CR/LF, since a subject is a header and an unescaped
+newline in one is header injection.
+
+### 7. The client reported failures as successes — *medium*
+
+`mode: 'no-cors'` makes the response opaque: `fetch` resolves for *any*
+reply, including a silent rejection. The client deleted the queued item on
+resolve, so while the endpoint was discarding writes, every one was counted
+as delivered and erased. That is why a broken endpoint looked like a working
+one.
+
+**Fixed.** Items survive two attempts before being dropped, and the Setup
+screen reports queue depth and last attempt. A queue that never empties is
+now visible.
+
+---
+
 ## Checked and clean
 
 | Area | Finding |

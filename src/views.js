@@ -1263,6 +1263,28 @@ function setupPanel(){
       '<p>Five settings. Everything below is read live — nothing here is a box you tick yourself. '+
       'The site works right now with none of them done; each one removes a limitation.</p></div></div>'+
 
+    /* Sending is opaque by design (no-cors), so this reports the only two
+       things the browser can actually know: how many items are waiting and
+       when we last tried. A queue that never empties is the symptom of an
+       endpoint that is accepting requests and discarding them. */
+    (function(){
+      var q = (M.S && M.S.queue) ? M.S.queue.length : 0;
+      var last = M.S && M.S.lastFlush ? new Date(M.S.lastFlush).toLocaleString('en-GB') : 'never';
+      var ep = !!M.CHECKIN_ENDPOINT;
+      return '<div class="su-state '+(!ep ? 'is-fallback' : (q ? 'is-warn' : 'is-live'))+'">'+
+        (!ep
+          ? '<strong>Nothing is being sent.</strong> No endpoint is configured, so check-ins and feature requests stay on each person&rsquo;s device.'
+          : q
+            ? '<strong>'+q+' item'+(q===1?'':'s')+' still queued on this device.</strong> Last attempt: '+esc(last)+
+              '. A queue that does not empty means the endpoint is taking the request and discarding it &mdash; open '+
+              '<a href="'+esc(M.CHECKIN_ENDPOINT)+'" target="_blank" rel="noopener noreferrer">the endpoint URL</a> '+
+              'in a tab to see what it reports about itself.'
+            : '<strong>Nothing waiting to send.</strong> Last attempt: '+esc(last)+
+              '. Open <a href="'+esc(M.CHECKIN_ENDPOINT)+'" target="_blank" rel="noopener noreferrer">the endpoint URL</a> '+
+              'in a tab if you want to check what it reports about itself.')+
+      '</div>';
+    })()+
+
     '<div class="su-state '+(live?'is-live':'is-fallback')+'">'+
       (live
         ? '<strong>Access codes are coming from your sheet.</strong> '+esc(String(rs.count))+

@@ -23,7 +23,7 @@ function get(k,d){
 
 /* ───────── 4. STATE ───────── */
 
-function blank(){ return {xp:0, streak:0, last:null, done:{}, scores:{}, awards:[], awardsAt:{}, notes:[], checks:[], queue:[], joined:null, name:null}; }
+function blank(){ return {xp:0, streak:0, last:null, done:{}, scores:{}, awards:[], awardsAt:{}, notes:[], lastFlush:null, checks:[], queue:[], joined:null, name:null}; }
 function load(){ M.S = M.user ? get('m.s.'+M.user.u, blank()) : blank(); }
 function save(){ if(M.user) put('m.s.'+M.user.u, M.S); }
 function dayKey(d){ d=d||new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -91,16 +91,37 @@ function queueSend(payload){
      and it is not something to learn from a digest email. */
   M.S.queue.push(payload); save(); flush();
 }
+/* ── Sending ───────────────────────────────────────────────────────────
+   `no-cors` means the reply is opaque: fetch resolves for ANY response the
+   server gives, including a silent rejection. So a resolved promise proves
+   the request left the machine and nothing more.
+
+   The old version deleted the item on resolve. When the endpoint was
+   quietly dropping writes, the client counted every one as delivered and
+   erased it — the data was gone, the queue was empty, and there was no
+   signal anywhere that anything had failed. That is why a broken endpoint
+   looked like a working one.
+
+   Now: an item is only removed after `sendOk` attempts, and the attempt
+   count is kept. Items that never land accumulate a visible history, and
+   the Setup screen reports the queue depth and the last attempt, so a
+   silent failure has somewhere to show up. */
 function flush(){
   if(!M.CHECKIN_ENDPOINT || !M.S || !M.S.queue.length || !navigator.onLine) return;
-  var batch=M.S.queue.slice(); 
+  M.S.lastFlush = new Date().toISOString();
+  var batch=M.S.queue.slice();
   batch.forEach(function(p){
-    // no-cors: Apps Script accepts the write; we cannot read the reply, so we
-    // drop the item optimistically and let the next check-in re-send if needed.
     fetch(M.CHECKIN_ENDPOINT,{method:'POST',mode:'no-cors',
       headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)})
-      .then(function(){ var i=M.S.queue.indexOf(p); if(i>=0){M.S.queue.splice(i,1); save();} })
-      .catch(function(){});
+      .then(function(){
+        p._n = (p._n || 0) + 1;
+        /* Two attempts, then let it go. Keeping it forever would re-send
+           the same check-in every session and fill the sheet with
+           duplicates, which is a worse failure than losing one row. */
+        if(p._n >= 2){ var i=M.S.queue.indexOf(p); if(i>=0) M.S.queue.splice(i,1); }
+        save();
+      })
+      .catch(function(){ p._err = (p._err || 0) + 1; save(); });
   });
 }
 window.addEventListener('online', flush);

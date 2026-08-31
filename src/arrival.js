@@ -22,7 +22,7 @@ var poster = $('#filmPoster');
 var portrait = matchMedia('(max-aspect-ratio: 21/20)');
 function pickSource(){
   var p = portrait.matches;
-  var want = p ? 'assets/video/arrival-portrait.mp4?v=77' : 'assets/video/arrival.mp4?v=77';
+  var want = p ? 'assets/video/arrival-portrait.mp4?v=78' : 'assets/video/arrival.mp4?v=78';
   var wantPoster = p ? 'assets/img/arrival-poster-portrait.jpg' : 'assets/img/arrival-poster.jpg';
   if(film && film.getAttribute('src') !== want){
     film.setAttribute('src', want);

@@ -1631,3 +1631,11 @@ body.intro-locked{ overflow:hidden }
    transform of its own, so its rect is always the true layout size. */
 .mi-mapwrap{ width:100%; display:flex; justify-content:center }
 @media (max-width:760px){ .mi-mapwrap{ margin-bottom:84px } }
+
+/* A queue that is not emptying is a warning, not a failure — the data is
+   still on the device, it just is not arriving. */
+.su-state.is-warn{
+  border-color:color-mix(in srgb, var(--negative) 40%, transparent);
+  background:var(--negative-soft);
+}
+.su-state a{ text-decoration:underline; text-underline-offset:2px }

@@ -33,25 +33,46 @@
  * SETUP — about five minutes, once:
  *  1. Create a Google Sheet. Name it "Meridian — Cohort".
  *  2. Extensions → Apps Script. Delete the placeholder, paste this whole file.
- *  3. Fill in DIGEST_TO, REQUESTS_TO and POST_TOKEN below.
+ *  3. Set POST_TOKEN below to the same string as M.POST_TOKEN in
+ *     src/config.js. There is nothing else to fill in: mail goes to the
+ *     account the script runs as, and the code list is read from the
+ *     published access-codes sheet.
  *  4. Deploy → New deployment → Web app.
  *       Execute as:      Me
  *       Who has access:  Anyone
- *  5. Copy the Web app URL.
- *  6. In src/config.js set M.CHECKIN_ENDPOINT to that URL, M.POST_TOKEN to the
- *     same token, and M.SHEET_URL to the Sheet's own URL.
- *  7. Optional daily digest: Triggers (clock icon) → Add trigger →
+ *  5. Copy the Web app URL into M.CHECKIN_ENDPOINT in src/config.js, and
+ *     the Sheet's own URL into M.SHEET_URL.
+ *  6. Optional daily digest: Triggers (clock icon) → Add trigger →
  *     function sendDigest, time-driven, day timer, 7–8am.
+ *
+ * RE-DEPLOYING AFTER AN EDIT — the step everyone misses:
+ *     Deploy → Manage deployments → pencil icon → Version: New version.
+ * Saving the editor does NOT update the live web app. If you paste this
+ * file over the old one and skip that, the URL keeps running the old code
+ * and nothing appears to change.
  */
 
-/* Fill these in inside the Apps Script editor, NOT here.
-   This file is a template that lives in a public repository — an address
-   committed here is scrapeable by anyone, and by every crawler that walks
-   GitHub looking for exactly this. The whole reason the destination sits
-   server-side is so it is not published; committing it undoes that. The
-   copy you paste into Apps Script is private to your Google account. */
-var DIGEST_TO   = '';   // ← your address, set in the Apps Script editor
-var REQUESTS_TO = '';   // ← your address, set in the Apps Script editor
+/* WHERE MAIL GOES — deliberately not a constant you have to fill in.
+
+   This file lives in a public repository, so an address written here is
+   scrapeable by every crawler that walks GitHub. But leaving it blank is
+   worse: MailApp.sendEmail({to:''}) throws, the throw is caught, and the
+   result is silence — which is exactly the failure that happened.
+
+   So it resolves itself. The script is deployed "execute as me", so the
+   effective user IS you, and that is the address. No setup step to forget,
+   nothing sensitive committed, and no way to leave it empty.
+
+   To send somewhere else, add a script property instead of editing this:
+     Project Settings → Script properties → REQUESTS_TO = other@example.com */
+function mailTo_(which) {
+  var props = PropertiesService.getScriptProperties();
+  var override = props.getProperty(which);
+  if (override) return override;
+  var me = Session.getEffectiveUser().getEmail();
+  if (me) return me;
+  throw new Error('No recipient: set a ' + which + ' script property.');
+}
 
 /* Any non-guessable string. Must match M.POST_TOKEN in src/config.js. */
 var POST_TOKEN = 'Meridianismy2ndprojectyayy#';
@@ -85,13 +106,13 @@ function doPost(e) {
 
     if (p.type === 'checkin') {
       sheet_(T.checkins).appendRow([
-        new Date(), p.day || '', code, p.name || '', p.role || '',
+        new Date(), clean_(p.day, 20), code, clean_(p.name, 120), clean_(p.role, 30),
         num_(p.streak), num_(p.xp), num_(p.cities)
       ]);
     } else if (p.type === 'note') {
       /* Only ever reached because someone tapped Share on this note. */
       sheet_(T.notes).appendRow([
-        new Date(), code, p.name || '', p.role || '', clean_(p.text, 2000)
+        new Date(), code, clean_(p.name, 120), clean_(p.role, 30), clean_(p.text, 2000)
       ]);
     } else if (p.type === 'request') {
       handleRequest_(p, code);
@@ -103,30 +124,59 @@ function doPost(e) {
   }
 }
 
-/* Is this a code we issued? Reads the Roster tab, which the app upserts, plus
-   anything you have typed in by hand. Cached so a burst of check-ins does not
-   read the whole sheet once per request. */
+/* ── Who is allowed to write ────────────────────────────────────────────
+   This used to read the Roster tab. That tab is populated BY this script,
+   by upsertRoster_, which runs AFTER this check — so the very first write
+   found it empty and was allowed, created a row, and from that moment
+   every OTHER code was "not on the roster" and was silently dropped.
+   Exactly one participant ever got through. That is the bug that made the
+   check-in sheet look broken.
+
+   The real list of who is allowed is the published access-codes sheet —
+   the same CSV the site itself reads. So read that. It is already public,
+   so fetching it discloses nothing, and adding a row there now grants
+   access to both the site and this endpoint at once.
+
+   If the sheet cannot be reached, ACCEPT the write. A network blip on
+   Google's side must not throw away somebody's streak; the token and the
+   rate limit are still in front of us. */
+var ROSTER_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQptExgi0IFtQuDtywHgaws8Kn4tA1ZOWWuFGoABd4PKWe-6axrBcW9xHWlrN7_VEvp8oiiqLbot8Ze/pub?output=csv';
+
+function normCode_(v) { return String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+
 function knownCode_(code) {
+  if (!ROSTER_CSV) return true;
   var cache = CacheService.getScriptCache();
-  var hit = cache.get('codes');
+  var hit = cache.get('codes_v2');
   var codes;
   if (hit) {
     codes = JSON.parse(hit);
   } else {
-    codes = [];
-    var sh = sheet_(T.roster);
-    var last = sh.getLastRow();
-    if (last > 1) {
-      sh.getRange(2, 1, last - 1, 1).getValues().forEach(function (r) {
-        if (r[0]) codes.push(String(r[0]).toUpperCase());
-      });
+    try {
+      var csv = UrlFetchApp.fetch(ROSTER_CSV, { muteHttpExceptions: true, followRedirects: true });
+      if (csv.getResponseCode() !== 200) return true;         // unreachable: let it through
+      var rows = Utilities.parseCsv(csv.getContentText());
+      if (!rows || rows.length < 2) return true;
+      var head = rows[0].map(function (h) { return String(h).trim().toLowerCase(); });
+      var iCode = head.indexOf('code'), iActive = head.indexOf('active');
+      if (iCode < 0) return true;
+      codes = [];
+      for (var r = 1; r < rows.length; r++) {
+        var c = normCode_(rows[r][iCode]);
+        if (!c) continue;
+        if (iActive >= 0) {
+          var a = String(rows[r][iActive] || '').trim().toLowerCase();
+          if (a === 'false' || a === 'no' || a === '0') continue;   // revoked
+        }
+        codes.push(c);
+      }
+      cache.put('codes_v2', JSON.stringify(codes), 300);
+    } catch (err) {
+      return true;                                            // never lock the room out
     }
-    cache.put('codes', JSON.stringify(codes), 300);
   }
-  /* An empty Roster is the first-run case: let the first writes through so
-     the sheet can populate itself, then the check bites from then on. */
   if (!codes.length) return true;
-  return codes.indexOf(code.toUpperCase()) >= 0;
+  return codes.indexOf(normCode_(code)) >= 0;
 }
 
 /* One write per code per 5 seconds. Stops a stuck retry loop or a bored
@@ -160,17 +210,20 @@ function handleRequest_(p, code) {
   var sent = '';
   try {
     MailApp.sendEmail({
-      to: REQUESTS_TO,
-      subject: 'Meridian · ' + kind + ' from ' + (p.name || code),
+      to: mailTo_('REQUESTS_TO'),
+      /* Newlines stripped: a subject line is a mail header, and an
+         unescaped CR/LF in one is how extra headers get injected. */
+      subject: ('Meridian · ' + kind + ' from ' + clean_(p.name || code, 80))
+                 .replace(/[\r\n]+/g, ' ').slice(0, 180),
       body: [
         kind.toUpperCase(),
         '',
         msg,
         '',
         '— — —',
-        'From:  ' + (p.name || '(no name)') + '  [' + code + ']',
-        'Role:  ' + (p.role || 'participant'),
-        'Seat:  ' + (p.seat || '—'),
+        'From:  ' + clean_(p.name || '(no name)', 120) + '  [' + code + ']',
+        'Role:  ' + clean_(p.role || 'participant', 30),
+        'Seat:  ' + clean_(p.seat || '—', 20),
         'XP:    ' + num_(p.xp) + '   Cities: ' + num_(p.cities),
         'Sent:  ' + new Date()
       ].join('\n')
@@ -179,10 +232,28 @@ function handleRequest_(p, code) {
   } catch (err) {
     sent = 'FAILED: ' + err;      // quota exhausted, most likely
   }
-  sheet_(T.reqs).appendRow([new Date(), code, p.name || '', kind, msg, sent]);
+  sheet_(T.reqs).appendRow([new Date(), code, clean_(p.name, 120), kind, msg, sent]);
 }
 
-function doGet() { return ok(); }
+/* Open the deployment URL in a browser to see whether it is alive and how
+   it is configured. Previously this returned a bare {ok:true}, which told
+   you nothing when something was wrong. Reports no addresses and no codes
+   — only whether each piece resolves. */
+function doGet() {
+  var out = { ok: true, service: 'Meridian check-in endpoint' };
+  try { out.recipientResolves = !!mailTo_('REQUESTS_TO'); }
+  catch (err) { out.recipientResolves = false; out.recipientError = String(err); }
+  out.tokenRequired = !!POST_TOKEN;
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    out.spreadsheet = ss ? ss.getName() : null;
+    out.tabs = ss ? ss.getSheets().map(function (sh) { return sh.getName(); }) : [];
+  } catch (err) { out.spreadsheet = 'ERROR: ' + err; }
+  out.codeListReachable = knownCode_('___probe___') !== undefined;
+  try { out.mailQuotaRemaining = MailApp.getRemainingDailyQuota(); } catch (err) {}
+  return ContentService.createTextOutput(JSON.stringify(out, null, 2))
+    .setMimeType(ContentService.MimeType.JSON);
+}
 
 function ok() {
   return ContentService.createTextOutput(JSON.stringify({ ok: true }))
@@ -217,8 +288,12 @@ function upsertRoster_(p) {
   }
 
   var now = new Date();
+  /* Every one of these is attacker-controlled: the name is typed by the
+     participant at sign-in and nothing validates it. Straight into a cell,
+     a name of `=HYPERLINK("http://evil","Payroll")` becomes a live formula
+     in your sheet. clean_ prefixes a quote so it stays text. */
   var values = [
-    p.code, p.seat || '', p.name || '', p.role || 'participant',
+    clean_(p.code, 40), clean_(p.seat, 20), clean_(p.name, 120), clean_(p.role, 30),
     now, now,
     num_(p.xp), num_(p.streak), num_(p.cities), num_(p.awards), num_(p.notes)
   ];
@@ -293,7 +368,7 @@ function sendDigest() {
   html += '</div>';
 
   MailApp.sendEmail({
-    to: DIGEST_TO,
+    to: mailTo_('DIGEST_TO'),
     subject: 'Meridian — ' + people.length + ' checked in, ' + notes.length + ' field notes',
     htmlBody: html
   });
