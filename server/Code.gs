@@ -77,6 +77,11 @@ function mailTo_(which) {
 /* Any non-guessable string. Must match M.POST_TOKEN in src/config.js. */
 var POST_TOKEN = 'Meridianismy2ndprojectyayy#';
 
+/* The ONLY four tabs this script touches, and it reaches every one of them
+   by name — never by position, never getActiveSheet(). Any other tab in
+   this spreadsheet is yours: a cohort tracker, scratch working, anything.
+   It will not be written to, cleared, reordered or reported on. If you add
+   a tab here, keep the name distinct from these four. */
 var T = { roster: 'Roster', checkins: 'Check-ins', notes: 'Field notes', reqs: 'Requests' };
 
 var HEAD = {
@@ -244,11 +249,23 @@ function doGet() {
   try { out.recipientResolves = !!mailTo_('REQUESTS_TO'); }
   catch (err) { out.recipientResolves = false; out.recipientError = String(err); }
   out.tokenRequired = !!POST_TOKEN;
+  /* Report whether OUR four tabs exist — never enumerate what is actually
+     in the file. This endpoint is deployed "access: Anyone", so anything
+     returned here is public. Listing every tab published the owner's own
+     tab names alongside ours, and people keep private working tabs in this
+     spreadsheet: a tracker named "Participant names and codes" would have
+     had that name readable by anyone holding the URL. Their tabs are not
+     ours to advertise. */
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-    out.spreadsheet = ss ? ss.getName() : null;
-    out.tabs = ss ? ss.getSheets().map(function (sh) { return sh.getName(); }) : [];
-  } catch (err) { out.spreadsheet = 'ERROR: ' + err; }
+    out.boundToSpreadsheet = !!ss;
+    if (ss) {
+      out.tabsReady = {};
+      [T.roster, T.checkins, T.notes, T.reqs].forEach(function (name) {
+        out.tabsReady[name] = !!ss.getSheetByName(name);
+      });
+    }
+  } catch (err) { out.boundToSpreadsheet = 'ERROR: ' + err; }
   out.codeListReachable = knownCode_('___probe___') !== undefined;
   try { out.mailQuotaRemaining = MailApp.getRemainingDailyQuota(); } catch (err) {}
   return ContentService.createTextOutput(JSON.stringify(out, null, 2))

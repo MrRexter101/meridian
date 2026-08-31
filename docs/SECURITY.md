@@ -155,6 +155,18 @@ one.
 screen reports queue depth and last attempt. A queue that never empties is
 now visible.
 
+### 8. The public diagnostic listed every tab in the private sheet — *low*
+
+`doGet` is deployed with access **Anyone**, and it returned
+`tabs: [...every sheet name in the file...]`. Contents were never exposed,
+but tab *names* were — and the cohort spreadsheet is where the trainer keeps
+private working tabs. A tab named "Participant names and codes" would have
+had that name readable by anyone holding the endpoint URL.
+
+**Fixed.** It now reports only whether each of *its own* four tabs exists.
+The script reaches every sheet by name and never by position, so any other
+tab in that file is untouched and unreported.
+
 ---
 
 ## Checked and clean
