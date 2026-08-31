@@ -1,0 +1,112 @@
+/* ============================================================
+   MOTION
+   One authored moment — the arrival. Everything else is response.
+
+   Frequency governs amplitude:
+     navigation (tens/day)  → near-imperceptible, 180ms
+     completing a city      → occasional, a real reveal
+     unlocking an award     → rare, and the only place with overshoot
+   ============================================================ */
+
+/* ── View change. Seen constantly, so it stays under the threshold
+      of "did something just animate?" ── */
+.view-enter{
+  animation:view-in .18s var(--ease-out) both;
+}
+@keyframes view-in{
+  from{ opacity:0; transform:translateY(4px) }
+  to  { opacity:1; transform:none }
+}
+
+/* ── The tour, first time only. Arrival is an event, not a state:
+      replaying it on every visit reads as a twitch. ── */
+.stagger .stop{
+  animation:stop-in .34s var(--ease-out) both;
+}
+.stagger .stop:nth-child(1){animation-delay:0ms}
+.stagger .stop:nth-child(2){animation-delay:45ms}
+.stagger .stop:nth-child(3){animation-delay:90ms}
+.stagger .stop:nth-child(4){animation-delay:135ms}
+.stagger .stop:nth-child(5){animation-delay:180ms}
+.stagger .stop:nth-child(6){animation-delay:225ms}
+.stagger .stop:nth-child(7){animation-delay:270ms}
+@keyframes stop-in{
+  from{ opacity:0; transform:translateY(10px) }
+  to  { opacity:1; transform:none }
+}
+
+/* ── Quick-check verdict. You have just been scored; the number
+      should land rather than appear. ── */
+.verdict{
+  animation:verdict-in .26s var(--ease-out) both;
+}
+@keyframes verdict-in{
+  from{ opacity:0; transform:translateY(6px) }
+  to  { opacity:1; transform:none }
+}
+
+/* ── Award unlock. Rare tier — the delight budget lives here, and
+      this is the only overshoot in the product. ── */
+.medal-pop{
+  animation:medal-pop .42s var(--ease-out) both;
+}
+@keyframes medal-pop{
+  0%  { opacity:0; transform:scale(.86) }
+  62% { opacity:1; transform:scale(1.06) }
+  100%{ opacity:1; transform:scale(1) }
+}
+
+/* ── Daily check-in. Once a day, so it can afford to be felt. ── */
+.flame-lit{
+  animation:flame-lit .44s var(--ease-out) both;
+}
+@keyframes flame-lit{
+  0%  { transform:scale(1) }
+  40% { transform:scale(1.14) }
+  100%{ transform:scale(1) }
+}
+
+/* ── Streak dots fill left to right as the week builds. ── */
+.dots i.on{ animation:dot-in .3s var(--ease-out) both }
+.dots i:nth-child(1){animation-delay:0ms}   .dots i:nth-child(2){animation-delay:26ms}
+.dots i:nth-child(3){animation-delay:52ms}  .dots i:nth-child(4){animation-delay:78ms}
+.dots i:nth-child(5){animation-delay:104ms} .dots i:nth-child(6){animation-delay:130ms}
+.dots i:nth-child(7){animation-delay:156ms}
+@keyframes dot-in{
+  from{ transform:scale(.4); opacity:0 }
+  to  { transform:scale(1);  opacity:1 }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   Fewer and gentler, not zero. Movement and position changes go;
+   opacity and colour stay, because they are what confirm the
+   interface heard you.
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  /* The scroll world becomes a single static frame. */
+  #arrival{ height:100svh }
+  #arrival .stage{ position:relative }
+  #copyA{ display:none }
+  #copyB{ opacity:1 !important; transform:none !important; position:static !important }
+  .hero-cue{ display:none }
+
+  /* Keep the fade, drop the travel. */
+  .view-enter{ animation:fade-in .18s ease both }
+  .stagger .stop{ animation:fade-in .2s ease both; animation-delay:0ms !important }
+  .verdict{ animation:fade-in .2s ease both }
+  .medal-pop{ animation:fade-in .24s ease both }
+  .flame-lit{ animation:none }
+  .dots i.on{ animation:fade-in .2s ease both; animation-delay:0ms !important }
+  @keyframes fade-in{ from{opacity:0} to{opacity:1} }
+
+  /* No element should travel across the screen. */
+  .enter-btn:hover,
+  .stop.open .stopcard:hover,
+  .stop.done .stopcard:hover,
+  .award.won:hover,
+  .opt:hover:not([disabled]){ transform:none }
+
+  .rail{ transition:none }
+  #toast{ transition:opacity .2s ease }
+}

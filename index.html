@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Meridian — The Credit Risk World Tour</title>
+<meta name="description" content="A seven-city journey through advanced credit risk, for the Royal Insurance Corporation of Bhutan.">
+<meta name="color-scheme" content="light dark">
+
+<!-- Content Security Policy — LIVE, now that the site is served over https.
+
+     It stays live from here on. If you ever go back to opening index.html
+     by double-click, comment it out again: `script-src 'self'` does not
+     match file:// subresources in Chrome, and the page will render blank
+     with only a console error to explain it.
+
+     Four directives here are load-bearing and easy to leave out, because
+     `default-src 'none'` silently swallows whatever you forget:
+       media-src    the hero film is a <video>. Without this the landing
+                    page is a still poster and nothing scrolls.
+       frame-src    the lesson videos are youtube-nocookie iframes.
+       connect-src  docs.google.com is where the live access-code CSV is
+                    read from, and script.google.com is the check-in
+                    endpoint. The *.googleusercontent.com wildcard is not
+                    optional: a published sheet REDIRECTS to a per-document
+                    host like doc-0o-38-sheets.googleusercontent.com, CSP
+                    applies to the redirect target as well as the request,
+                    and the subdomain differs per document. Without it the
+                    roster fetch fails silently and the baked-in fallback
+                    covers for it, so nobody notices until a code added in
+                    the sheet does not work.
+       img-src blob: the passport share card is exported through a blob URL.
+     Change any of those in the app and change them here in the same commit.
+
+-->
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'self';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: blob:;
+  media-src 'self';
+  frame-src https://www.youtube-nocookie.com;
+  connect-src 'self' https://docs.google.com https://script.google.com https://*.googleusercontent.com;
+  base-uri 'none';
+  form-action 'none'">
+
+
+<meta name="theme-color" content="#F4EEE2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#100D0A" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A5F22' stroke-width='1.8'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='m15.5 8.5-2 5-5 2 2-5z'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..800,0..100,0..1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/styles/tokens.css?v=77">
+<link rel="stylesheet" href="assets/styles/base.css?v=77">
+<link rel="stylesheet" href="assets/styles/components.css?v=77">
+<link rel="stylesheet" href="assets/styles/responsive.css?v=77">
+<link rel="stylesheet" href="assets/styles/world.css?v=77">
+<link rel="stylesheet" href="assets/styles/motion.css?v=77">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<g id="i-compass"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></g>
+<g id="i-map"><path d="M9 4 3 6.5v13.5L9 17.5m0-13.5 6 2.5m-6-2.5v13.5m6-11 6-2.5v13.5L15 20m0-13.5V20m0 0-6-2.5"/></g>
+<g id="i-medal"><circle cx="12" cy="14.5" r="5.5"/><path d="M8.5 9.2 6 2.5h12l-2.5 6.7"/></g>
+<g id="i-note"><path d="M5 3.5h14v17H5z"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4"/></g>
+<g id="i-flame"><path d="M12 21c3.6 0 6-2.4 6-5.6 0-4.1-4-5.6-4-9.4-3.2 1-4.6 3.8-4.6 6 0 1.3-1 1.8-1.6 1.1-.5-.6-.8-1.5-.8-2.4C5.2 13 6 21 12 21Z"/></g>
+<g id="i-lock"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></g>
+<g id="i-check"><path d="m5 12.5 4.5 4.5L19 7"/></g>
+<g id="i-arrow"><path d="M5 12h14m-6-6 6 6-6 6"/></g>
+<g id="i-down"><path d="M12 5v14m-6-6 6 6 6-6"/></g>
+<g id="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></g>
+<g id="i-moon"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z"/></g>
+<g id="i-out"><path d="M15 4.5h3.5a1.5 1.5 0 0 1 1.5 1.5v12a1.5 1.5 0 0 1-1.5 1.5H15"/><path d="M10 8l-4 4 4 4M6 12h10"/></g>
+<g id="i-menu"><path d="M4 7h16M4 12h16M4 17h16"/></g>
+<g id="i-info"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.4"/></g>
+<g id="i-scale"><path d="M12 4v16M6 8H3l3-4 3 4H6Zm12 0h-3l3-4 3 4h-3Z"/><path d="M4 20h16"/></g>
+<g id="i-building"><path d="M4 20.5V5.2L14 3v17.5M14 20.5h6V9.5l-6-2"/><path d="M7 8h4M7 11.5h4M7 15h4M16.5 12h1.5M16.5 15.5h1.5"/></g>
+<g id="i-heart"><path d="M12 20s-7-4.6-7-9.4A4 4 0 0 1 12 8a4 4 0 0 1 7 2.6C19 15.4 12 20 12 20Z"/></g>
+<g id="i-play"><path d="M8 5.5v13l11-6.5z" fill="currentColor" stroke="none"/></g>
+<g id="i-globe"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18"/></g>
+<g id="i-file"><path d="M13.5 3.5H7a1.5 1.5 0 0 0-1.5 1.5v14A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V8.5z"/><path d="M13.5 3.5v5h5"/><path d="M8.5 13h7M8.5 16.5h4.5"/></g>
+<g id="i-box"><path d="M3 8.5 12 4l9 4.5v7L12 20l-9-4.5z"/><path d="M3 8.5 12 13l9-4.5M12 13v7"/></g>
+<g id="i-reset"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4v5h5"/></g>
+<g id="i-x"><path d="M6 6l12 12M18 6 6 18"/></g>
+</defs></svg>
+
+<!-- ══════════════════ ARRIVAL ══════════════════ -->
+<section id="arrival" aria-label="Introduction">
+  <div class="stage">
+    <img id="filmPoster" src="assets/img/arrival-poster.jpg" data-end="assets/img/arrival-end.jpg" alt="" aria-hidden="true">
+    <video id="film" muted playsinline preload="auto"
+           disablepictureinpicture aria-hidden="true"></video>
+    <div class="hero-copy">
+      <div id="copyA" style="display:flex;flex-direction:column;gap:16px;align-items:flex-start;transition:opacity .25s linear">
+        <h1 class="hero-title">He went round the world to learn what was next door.</h1>
+        <p class="hero-sub">Seven cities. Seven ideas that decide whether a loan is priced, provisioned and structured &mdash; or merely approved.</p>
+      </div>
+      <div id="copyB" style="display:flex;flex-direction:column;gap:16px;align-items:flex-start;opacity:0;position:absolute;left:clamp(20px,6vw,80px);right:clamp(20px,6vw,80px);bottom:clamp(40px,9vh,96px);transition:opacity .25s linear">
+        <h1 class="hero-title" style="font-size:clamp(2.2rem,7vw,4.2rem)">Stop one of seven.<br>Thimphu.</h1>
+        <button class="enter-btn" id="enterBtn" type="button">
+          Begin the tour <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-arrow"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="hero-cue" id="heroCue"><span>Scroll</span><span class="cue-line"></span></div>
+  </div>
+</section>
+
+<!-- ══════════════════ LOGIN ══════════════════ -->
+<section id="login" aria-label="Sign in">
+  <div class="login-card">
+    <div class="login-mark">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-compass"/></svg>
+      <span class="wordmark">Meridian</span>
+    </div>
+    <h1>Tell us who you are.</h1>
+    <p class="lede">Your name is how your progress is recorded. The access code is on your handout.</p>
+    <form id="loginForm" novalidate>
+      <label class="field"><span>Your full name</span>
+        <input id="nameIn" type="text" autocomplete="name" autocapitalize="words" spellcheck="false" placeholder="Mr. / Ms. ———" required></label>
+      <label class="field"><span>Access code</span>
+        <input id="codeIn" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX" required></label>
+      <button class="btn-primary" type="submit">Begin</button>
+    </form>
+    <div id="loginErr" hidden></div>
+    <p class="gate-note">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-info"/></svg>
+      <span>This sign-in <strong>gates the content, it does not secure it.</strong> There is no server — the credential list is readable in this page's source. Nothing confidential belongs behind it.</span>
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════ APP ══════════════════ -->
+<div id="app">
+  <div class="scrim" id="scrim"></div>
+  <nav class="rail" id="rail" aria-label="Main">
+    <button class="brandrow" data-go="dash" aria-label="Meridian — go to the dashboard">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-compass"/></svg>
+      <span class="wordmark">Meridian</span>
+    </button>
+    <button class="navbtn" data-go="dash"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-compass"/></svg><span data-i18n="dashboard">Dashboard</span></button>
+    <button class="navbtn" data-go="tour"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-map"/></svg><span data-i18n="tour">The Tour</span></button>
+    <button class="navbtn" data-go="awards"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-medal"/></svg><span data-i18n="awards">Awards</span></button>
+    <button class="navbtn" data-go="desk"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-scale"/></svg><span data-i18n="desk">The desk</span></button>
+    <button class="navbtn" data-go="file"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-file"/></svg><span data-i18n="file">The file</span></button>
+    <button class="navbtn" data-go="resources"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-box"/></svg><span data-i18n="resources">Resources</span></button>
+    <button class="navbtn" data-go="thanks"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-heart"/></svg><span data-i18n="thanks">Thank you</span></button>
+    <button class="navbtn" data-go="cohort" id="navCohort" hidden><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-building"/></svg><span data-i18n="cohort">Cohort</span></button>
+    <div class="spacer"></div>
+    <div class="railfoot">
+      <div class="who"><div class="avatar" id="av">—</div><div style="min-width:0"><div class="nm" id="nm">—</div><div class="rk" id="rk">—</div></div></div>
+      <button class="navbtn" id="langBtn"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-globe"/></svg><span id="langLbl">English</span></button>
+      <button class="navbtn" id="themeBtn"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sun" id="themeIcon"/></svg><span id="themeLbl">Theme</span></button>
+      <button class="navbtn danger" id="resetBtn"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-reset"/></svg><span data-i18n="reset">Reset my progress</span></button>
+      <button class="navbtn" id="outBtn"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-out"/></svg><span data-i18n="signout">Sign out</span></button>
+    </div>
+  </nav>
+  <div style="min-width:0;position:relative">
+    <div class="mobilebar">
+      <button class="btn" id="menuBtn" aria-label="Open menu" style="padding:8px 10px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><use href="#i-menu"/></svg></button>
+      <span class="wordmark">Meridian</span>
+    </div>
+    <div class="decal" id="decal" aria-hidden="true"></div>
+    <div class="mist" id="mist" aria-hidden="true"><i></i><i></i><i></i></div>
+    <main id="view" tabindex="-1"></main>
+  </div>
+</div>
+
+<button class="notes-fab" id="notesFab" aria-label="Open field notes" hidden>
+  <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-note"/></svg>
+  <span class="count" id="notesCount" hidden>0</span>
+</button>
+
+<aside class="journal" id="journal" aria-label="Field notes" aria-hidden="true">
+  <div class="journal-head">
+    <div>
+      <h2>Field notes</h2>
+      <p>Not a quiz. The one question that reaches a real file on a real desk.</p>
+    </div>
+    <button class="journal-close" id="journalClose" aria-label="Close field notes">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-x"/></svg>
+    </button>
+  </div>
+  <div class="journal-body" id="journalBody"></div>
+</aside>
+
+<dialog id="vidModal" aria-label="Video">
+  <div class="shell">
+    <div id="vidHolder"></div>
+    <div class="bar"><strong id="vidTitle"></strong>
+      <button class="btn" id="vidClose">Close</button></div>
+  </div>
+</dialog>
+
+<!-- Award detail. Materialises from the card that opened it. -->
+<!-- The route, full screen, on arrival. Scroll or tap through it. -->
+<div class="mapintro" id="mapIntro" hidden></div>
+
+<div class="adwrap" id="adWrap" hidden>
+  <div class="ad-scrim" id="adScrim"></div>
+  <div class="ad-slot" id="adSlot"></div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<!-- Classic scripts, loaded in dependency order. No modules and no bundler,
+     so this page also opens correctly straight from the filesystem. -->
+<script src="src/config.js?v=77"></script>
+<script src="src/i18n.js?v=77"></script>
+<script src="src/resources.js?v=77"></script>
+<script src="src/ask.js?v=77"></script>
+<script src="src/content.js?v=77"></script>
+<script src="src/bhutan.js?v=77"></script>
+<script src="src/research.js?v=77"></script>
+<script src="src/tools.js?v=77"></script>
+<script src="src/places.js?v=77"></script>
+<script src="src/share.js?v=77"></script>
+<script src="src/core.js?v=77"></script>
+<script src="src/views.js?v=77"></script>
+<script src="src/app.js?v=77"></script>
+<script src="src/arrival.js?v=77"></script>
+</body>
+</html>

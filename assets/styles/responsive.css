@@ -1,0 +1,37 @@
+/* ============================================================
+   RESPONSIVE — 375 is the design width
+   ============================================================ */
+@media (max-width:900px){
+  #app.on{grid-template-columns:1fr}
+  .rail{
+    position:fixed;inset:0 auto 0 0;width:min(84vw,300px);z-index:70;
+    transform:translateX(-102%);transition:transform .4s var(--ease-drawer);
+    box-shadow:var(--shadow-3)
+  }
+  .rail.open{transform:none}
+  .mobilebar{
+    display:flex;align-items:center;gap:12px;padding:11px 15px;
+    position:sticky;top:0;z-index:60;background:var(--surface);border-bottom:1px solid var(--line)
+  }
+  .mobilebar .wordmark{font-family:var(--font-display);font-size:1.06rem;font-weight:600;letter-spacing:-.03em}
+  .scrim.on{opacity:1;pointer-events:auto;visibility:visible}
+  main{padding:20px 16px 60px}
+  .tour{padding-left:44px}
+  .tour::before{left:19px}
+  .node{left:-44px;width:38px;height:38px;top:14px}
+}
+@media (max-width:420px){
+  .awards{grid-template-columns:1fr}
+  .stat .v{font-size:1.85rem}
+  .hero-copy{padding-bottom:76px}
+}
+
+/* On a phone the building fills the lower half of the portrait film, so the
+   copy moves into the sky above it rather than sitting on top of it. */
+@media (max-aspect-ratio: 21/20){
+  .hero-copy{ top:0; bottom:auto; padding-top:calc(env(safe-area-inset-top) + 34px); justify-content:flex-start }
+  .hero-copy::before{ inset:0 0 auto 0; height:70%;
+    background:linear-gradient(to bottom, rgba(4,7,14,.88), rgba(4,7,14,.40) 46%, rgba(4,7,14,0)) }
+  #copyB{ top:calc(env(safe-area-inset-top) + 34px); bottom:auto }
+  .hero-title{ font-size:clamp(2.2rem,9vw,3.2rem) }
+}

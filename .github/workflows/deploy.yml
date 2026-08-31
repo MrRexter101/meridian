@@ -1,0 +1,47 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      # No build step — the site is plain files. But not EVERY file:
+      # publishing the repo root would serve docs/CREDENTIALS.md, which
+      # lists every access code against a seat name, at a guessable URL.
+      # The codes are readable in src/config.js either way, by design —
+      # a markdown table of them is a different order of discoverable.
+      # studio/ (the Remotion source) and server/ (the Apps Script) are
+      # not needed by the browser either, so only the site itself ships.
+      - uses: actions/checkout@v4
+      - name: Stage the site
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -R src assets _site/
+          [ -f README.md ] && cp README.md _site/ || true
+          # Fail loudly rather than publishing a code list by accident.
+          if [ -e _site/docs ] || [ -e _site/server ] || [ -e _site/studio ]; then
+            echo "::error::Non-public directory staged for publication"; exit 1
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

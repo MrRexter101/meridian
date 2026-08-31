@@ -1,0 +1,112 @@
+/* ============================================================
+   LAYER 1 — raw palette. Never flips.
+   ============================================================ */
+:root{
+  --ink-900:#14110D; --ink-800:#1D1913; --ink-700:#2A2520; --ink-600:#3B342C; --ink-500:#4A423A;
+  --brass-700:#6B4715; --brass-600:#8A5F22; --brass-500:#B4813C; --brass-400:#D4A65E; --brass-300:#E8C68C; --brass-200:#F2DFBC;
+  --oxide-600:#8A3521; --oxide-500:#A8432A; --oxide-400:#C4644A;
+  --verd-600:#245349; --verd-500:#2F6B5E; --verd-400:#4C8E7F;
+  --stone-050:#FBF8F1; --stone-100:#F6F1E7; --stone-200:#EDE5D7; --stone-300:#DCD1BE; --stone-400:#B9AB93; --stone-500:#8E806B;
+  --indigo-900:#080C17; --indigo-800:#0E1424; --indigo-700:#141D36; --indigo-600:#1B2440; --indigo-500:#2A4A7A;
+  --dawn-400:#C79A73; --dawn-300:#E5B98E; --dawn-200:#F2D9B0;
+
+  /* ==========================================================
+     LAYER 3 — materials. Flips. One sun, above-left.
+     ========================================================== */
+  --stone-lit:#FFFDF8; --stone-body:#EDE5D7; --stone-shade:#C9BCA3; --stone-cast:rgba(74,66,58,.16);
+  --brass-lit:#F6E3BE; --brass-body:#C8944A; --brass-shade:#8A5F22; --brass-cast:rgba(107,71,21,.26);
+  --lock-lit:#E6E1D6; --lock-body:#BDB5A6; --lock-shade:#948C7E;
+  --paper-bg:#FCF9F0; --paper-line:#D9CFB8; --paper-ink:#2A2520; --paper-edge:rgba(74,66,58,.14);
+
+  /* ── Share card ────────────────────────────────────────────────────
+     The exported passport card is always paper, whatever theme the app
+     is wearing — a passport page is not a dark-mode surface, and a card
+     going into someone's feed should not depend on how they had the
+     site set. Defined on bare :root ONLY and deliberately never
+     overridden below, so canvas can read them in any theme state. */
+  --share-paper:#F4EEE2; --share-card:#FBF8F1; --share-ink:#14110D;
+  --share-mute:#6B6154;  --share-brand:#8A5F22; --share-rule:#D9CFB8;
+
+  /* ── Mr. Meridian ──────────────────────────────────────────────────
+     A face is not a surface. Every other colour here flips with the
+     theme, but skin that inverts to dark brown in dark mode reads as a
+     different person, not as the same character at night. So he gets
+     his own two tokens: they shift just enough not to glare on a dark
+     page, and never across the line where he stops being himself. */
+  --face-skin:#F2DFBC; --face-ink:#14110D;
+
+  /* The reverse of the folded chart: same paper stock, no printing. */
+  --fold-back:#E7DAC0;
+
+  /* ==========================================================
+     LAYER 4 — semantic. Components may only reach this layer.
+     ========================================================== */
+  --bg:#F4EEE2;
+  --surface:#FBF8F1;
+  --surface-2:#F1EADC;
+  --surface-3:#E7DECD;
+  --text:#1D1913;
+  --text-2:#4A423A;
+  --text-3:#7A7062;
+  --line:#DED4C0;
+  --line-strong:#C6B99F;
+  --brand:#8A5F22;
+  --brand-soft:#F2DFBC;
+  --brand-text:#6B4715;
+  --positive:#245349;
+  --positive-soft:#DCEBE5;
+  --negative:#8A3521;
+  --negative-soft:#F6DFD7;
+  --focus:#B4813C;
+  --shadow-1:0 1px 2px rgba(74,66,58,.06), 0 2px 6px rgba(74,66,58,.05);
+  --shadow-2:0 2px 4px rgba(74,66,58,.07), 0 8px 20px rgba(74,66,58,.09);
+  --shadow-3:0 4px 10px rgba(74,66,58,.09), 0 18px 44px rgba(74,66,58,.13);
+
+  --ease-out:cubic-bezier(.23,1,.32,1);
+  --ease-in-out:cubic-bezier(.77,0,.175,1);
+  --ease-drawer:cubic-bezier(.32,.72,0,1);
+  --r-sm:8px; --r-md:12px; --r-lg:18px; --r-xl:26px;
+  --font-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --font-ui:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --rail:264px;
+  color-scheme:light dark;
+}
+
+/* Dark: only redefines what flips. Guarded so an explicit light choice wins. */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --stone-lit:#3A342B; --stone-body:#2A2520; --stone-shade:#171410; --stone-cast:rgba(0,0,0,.45);
+  --brass-lit:#E8C68C; --brass-body:#A2742F; --brass-shade:#5A3B12; --brass-cast:rgba(0,0,0,.5);
+  --lock-lit:#332E27; --lock-body:#25211B; --lock-shade:#191612;
+  --paper-bg:#221E18; --paper-line:#3B342C; --paper-ink:#EDE5D7; --paper-edge:rgba(0,0,0,.4);
+  --face-skin:#DCC5A4; --face-ink:#191410;
+  --fold-back:#241D14;
+    --bg:#100D0A; --surface:#1A1712; --surface-2:#221E18; --surface-3:#2C2721;
+    --text:#F6F1E7; --text-2:#C4B9A5; --text-3:#8E8371;
+    --line:#2E2922; --line-strong:#443C31;
+    --brand:#D4A65E; --brand-soft:#332714; --brand-text:#E8C68C;
+    --positive:#4C8E7F; --positive-soft:#16302B; --negative:#C4644A; --negative-soft:#33170F;
+    --focus:#D4A65E;
+    --shadow-1:0 1px 2px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.35);
+    --shadow-2:0 2px 4px rgba(0,0,0,.5), 0 8px 20px rgba(0,0,0,.4);
+    --shadow-3:0 4px 10px rgba(0,0,0,.5), 0 18px 44px rgba(0,0,0,.5);
+  }
+}
+/* Explicit dark wins in both directions. */
+:root[data-theme="dark"]{
+  --stone-lit:#3A342B; --stone-body:#2A2520; --stone-shade:#171410; --stone-cast:rgba(0,0,0,.45);
+  --brass-lit:#E8C68C; --brass-body:#A2742F; --brass-shade:#5A3B12; --brass-cast:rgba(0,0,0,.5);
+  --lock-lit:#332E27; --lock-body:#25211B; --lock-shade:#191612;
+  --paper-bg:#221E18; --paper-line:#3B342C; --paper-ink:#EDE5D7; --paper-edge:rgba(0,0,0,.4);
+  --face-skin:#DCC5A4; --face-ink:#191410;
+  --fold-back:#241D14;
+  --bg:#100D0A; --surface:#1A1712; --surface-2:#221E18; --surface-3:#2C2721;
+  --text:#F6F1E7; --text-2:#C4B9A5; --text-3:#8E8371;
+  --line:#2E2922; --line-strong:#443C31;
+  --brand:#D4A65E; --brand-soft:#332714; --brand-text:#E8C68C;
+  --positive:#4C8E7F; --positive-soft:#16302B; --negative:#C4644A; --negative-soft:#33170F;
+  --focus:#D4A65E;
+  --shadow-1:0 1px 2px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.35);
+  --shadow-2:0 2px 4px rgba(0,0,0,.5), 0 8px 20px rgba(0,0,0,.4);
+  --shadow-3:0 4px 10px rgba(0,0,0,.5), 0 18px 44px rgba(0,0,0,.5);
+}

@@ -1,0 +1,12 @@
+.DS_Store
+.DS_Store
+node_modules/
+*.log
+.vscode/
+.idea/
+
+# Remotion asset factory — source is versioned, build output is not
+studio/node_modules/
+studio/out/
+studio/probe/
+studio/.remotion/
